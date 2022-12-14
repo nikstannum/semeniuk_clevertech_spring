@@ -15,6 +15,7 @@ import by.clevertech.dao.entity.Product;
 import by.clevertech.dao.repository.CardRepository;
 import by.clevertech.dao.repository.ProductRepository;
 import by.clevertech.service.CheckService;
+import by.clevertech.service.dto.CheckDto;
 import by.clevertech.service.dto.CheckInputDto;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class CheckServiceImpl implements CheckService {
 	private final CardRepository cardRepository;
 
 	@Override
-	public Check get(CheckInputDto checkInputDto) {
+	public CheckDto get(CheckInputDto checkInputDto) {
 
 		// TODO Auto-generated method stub
 		return null;
@@ -93,7 +94,7 @@ public class CheckServiceImpl implements CheckService {
 	}
 
 	@Override
-	public Check findById(Long id) {
+	public CheckDto findById(Long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

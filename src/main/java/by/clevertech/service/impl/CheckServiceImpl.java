@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
 import by.clevertech.dao.entity.Check;
 import by.clevertech.dao.entity.CheckItem;
 import by.clevertech.dao.entity.DiscountCard;
@@ -16,6 +18,7 @@ import by.clevertech.service.CheckService;
 import by.clevertech.service.dto.CheckInputDto;
 import lombok.RequiredArgsConstructor;
 
+@Service
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
 	private final ProductRepository productRepository;

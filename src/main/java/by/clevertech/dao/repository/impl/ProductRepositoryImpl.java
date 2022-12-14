@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 import by.clevertech.dao.entity.Product;
 import by.clevertech.dao.repository.ProductRepository;
@@ -18,6 +19,7 @@ import by.clevertech.exception.EntityDeleteException;
 import by.clevertech.exception.EntityUpdateException;
 import lombok.RequiredArgsConstructor;
 
+@Repository
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements ProductRepository {
 	private static final String INSERT = "INSERT into ptoducts (name, price, discount) VALUES (:name, :price, :discount)";

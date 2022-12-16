@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import by.clevertech.dao.entity.Check;
 import by.clevertech.dao.entity.CheckItem;
 import by.clevertech.dao.entity.DiscountCard;
 import by.clevertech.dao.entity.Product;
@@ -27,9 +26,23 @@ public class CheckServiceImpl implements CheckService {
 
 	@Override
 	public CheckDto get(CheckInputDto checkInputDto) {
-
-		// TODO Auto-generated method stub
-		return null;
+		CheckDto check = new CheckDto();
+		List<CheckItem> items = getCheckItems(checkInputDto);
+		check.setProducts(items);
+		Long cardId = checkInputDto.getCardId();
+		/*
+		 * TODO Processing EntNotFoundExc: if the card is not found, then the
+		 * application should not crash
+		 */
+		BigDecimal costWithoutDiscounts = totalCostWithoutDiscounts(items);
+		BigDecimal costWithoutCard = totalCostWithoutCard(items);
+		if (cardId != null) {
+			BigDecimal costWithCard = totalCostWithCard(costWithoutCard, cardId);
+			check.setTotalCost(costWithCard);
+			return check;
+		}
+		check.setTotalCost(costWithoutCard);
+		return check;
 	}
 
 	private List<CheckItem> getCheckItems(CheckInputDto checkInputDto) {
@@ -45,52 +58,47 @@ public class CheckServiceImpl implements CheckService {
 			item.setTotal(total);
 			items.add(item);
 		}
-		BigDecimal costWithotDiscout = totalCostWithoutDiscount(items);
-		BigDecimal costWithDiscountProducts = costWithDiscountProducts(items);
-		BigDecimal totalCost = totalCostWithDiscountCard(costWithDiscountProducts, checkInputDto.getCardId());
-
-		// FIXME setTotalCost to items
 		return items;
 	}
 
-	private BigDecimal totalCostWithoutDiscount(List<CheckItem> items) {
+	private BigDecimal totalCostWithoutDiscounts(List<CheckItem> items) {
 		BigDecimal totalCostWithoutDiscount = BigDecimal.ZERO;
 		for (CheckItem item : items) {
-			totalCostWithoutDiscount.add(item.getTotal().multiply(BigDecimal.valueOf(item.getQuantity())));
+			totalCostWithoutDiscount = totalCostWithoutDiscount.add(item.getTotal());
 		}
-		return totalCostWithoutDiscount;
+		return totalCostWithoutDiscount.setScale(2, RoundingMode.HALF_UP);
 	}
 
 	private BigDecimal costDicsountItem(CheckItem item) {
-		BigDecimal cost = item.getTotal().multiply(BigDecimal.valueOf(0.1)); // FIXME Magic number
-		return cost;
+		BigDecimal discountForDiscountProduct = BigDecimal.valueOf(10); // FIXME Magic number (discount size = 10%)
+		BigDecimal discountFactor = BigDecimal.valueOf(100).subtract(discountForDiscountProduct);
+		BigDecimal cost = item.getTotal().multiply(discountFactor).divide(BigDecimal.valueOf(100));
+		return cost.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	private BigDecimal costWithDiscountProducts(List<CheckItem> items) {
+	private BigDecimal totalCostWithoutCard(List<CheckItem> items) {
 		BigDecimal totalCost = BigDecimal.ZERO;
 		for (CheckItem item : items) {
 			Integer quantity = item.getQuantity();
 			Product product = item.getProduct();
 			if (quantity > 5 && product.isDiscount()) {
-				totalCost.add(costDicsountItem(item));
+				totalCost = totalCost.add(costDicsountItem(item));
 			} else {
-				totalCost.add(item.getTotal());
+				totalCost = totalCost.add(item.getTotal());
 			}
 		}
-		return totalCost;
+		return totalCost.setScale(2, RoundingMode.HALF_UP);
 	}
 
-	private BigDecimal totalCostWithDiscountCard(BigDecimal cost, Long cardId) {
+	private BigDecimal totalCostWithCard(BigDecimal cost, Long cardId) {
 		BigDecimal totalCost = cost;
 		DiscountCard card = cardRepository.findById(cardId);
-		if (card != null) {
+		if (card != null) { // FIXME how will to processing better?
 			BigDecimal discountSize = card.getDiscountSize();
-			totalCost = totalCost.multiply(discountSize).divide(BigDecimal.valueOf(100)).setScale(2,
-							RoundingMode.HALF_EVEN);
-		} else {
-			totalCost.setScale(2, RoundingMode.HALF_EVEN);
+			BigDecimal discountFactor = BigDecimal.valueOf(100).subtract(discountSize);
+			totalCost = totalCost.multiply(discountFactor).divide(BigDecimal.valueOf(100));
 		}
-		return totalCost;
+		return totalCost.setScale(2, RoundingMode.HALF_UP);
 	}
 
 	@Override

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,8 +16,10 @@ import org.springframework.stereotype.Repository;
 
 import by.clevertech.dao.entity.DiscountCard;
 import by.clevertech.dao.repository.CardRepository;
+import by.clevertech.exception.AccessException;
 import by.clevertech.exception.EntityCreateException;
 import by.clevertech.exception.EntityDeleteException;
+import by.clevertech.exception.EntityNotFoundException;
 import by.clevertech.exception.EntityUpdateException;
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +52,14 @@ public class CardRepositoryImpl implements CardRepository {
 	public DiscountCard findById(Long id) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("cardId", id);
-		return template.queryForObject(FIND_BY_ID, params, this::mapRow);
+		try {
+			DiscountCard card = template.queryForObject(FIND_BY_ID, params, this::mapRow);
+			return card;
+		} catch (DataRetrievalFailureException e) {
+			throw new EntityNotFoundException("card with id = " + id + " wasn't found");
+		} catch (DataAccessException e) {
+			throw new AccessException(e.getMessage(), e.getCause());
+		}
 	}
 
 	@Override

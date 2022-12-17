@@ -1,6 +1,6 @@
 package by.clevertech.exception;
 
-public class EntityNotFoundException extends MyAppException {
+public class EntityNotFoundException extends ClientException {
 	public EntityNotFoundException() {
 	}
 

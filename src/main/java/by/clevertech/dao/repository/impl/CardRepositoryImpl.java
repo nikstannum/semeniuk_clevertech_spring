@@ -49,7 +49,7 @@ public class CardRepositoryImpl implements CardRepository {
 	}
 
 	@Override
-	public DiscountCard findById(Long id) {
+	public DiscountCard findById(Long id) throws EntityNotFoundException {
 		Map<String, Object> params = new HashMap<>();
 		params.put("cardId", id);
 		try {

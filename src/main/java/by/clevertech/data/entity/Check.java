@@ -1,14 +1,14 @@
-package by.clevertech.service.dto;
+package by.clevertech.data.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import by.clevertech.dao.entity.CheckItem;
 import lombok.Data;
 
 @Data
-public class CheckDto {
+public class Check {
+
 	private String header;
 	private LocalDateTime timestamp;
 	private List<CheckItem> products;

@@ -1,10 +1,10 @@
 package by.clevertech.service;
 
-import by.clevertech.service.dto.CheckDto;
-import by.clevertech.service.dto.CheckInputDto;
+import by.clevertech.service.dto.CheckOutDto;
+import by.clevertech.service.dto.CheckInDto;
 
-public interface CheckService extends CrudService<CheckDto, Long> {
-	public CheckDto get(CheckInputDto checkInputDto);
+public interface CheckService extends CrudService<CheckOutDto, Long> {
+	public CheckOutDto get(CheckInDto checkInputDto);
 
-	public CheckDto findById(Long id);
+	public CheckOutDto findById(Long id);
 }

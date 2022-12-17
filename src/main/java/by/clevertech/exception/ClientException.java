@@ -1,6 +1,6 @@
 package by.clevertech.exception;
 
-public class ClientException extends MyAppException {
+public class ClientException extends ClevertechException {
 
 	public ClientException() {
 		super();

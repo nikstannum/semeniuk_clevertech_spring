@@ -1,12 +1,12 @@
 package by.clevertech.service;
 
-import by.clevertech.dao.entity.Check;
-import by.clevertech.service.dto.CheckDto;
+import by.clevertech.data.entity.Check;
+import by.clevertech.service.dto.CheckOutDto;
 
 public class Mapper {
 
-	public CheckDto toCheckDto(Check check) {
-		CheckDto dto = new CheckDto();
+	public CheckOutDto toCheckDto(Check check) {
+		CheckOutDto dto = new CheckOutDto();
 		dto.setHeader(check.getHeader());
 		dto.setProducts(check.getProducts());
 		dto.setTimestamp(check.getTimestamp());
@@ -14,7 +14,7 @@ public class Mapper {
 		return dto;
 	}
 
-	public Check toCheckEntity(CheckDto dto) {
+	public Check toCheckEntity(CheckOutDto dto) {
 		Check check = new Check();
 		check.setHeader(dto.getHeader());
 		check.setProducts(dto.getProducts());

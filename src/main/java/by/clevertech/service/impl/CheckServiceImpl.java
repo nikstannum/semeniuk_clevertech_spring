@@ -8,14 +8,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import by.clevertech.dao.entity.CheckItem;
-import by.clevertech.dao.entity.DiscountCard;
-import by.clevertech.dao.entity.Product;
-import by.clevertech.dao.repository.CardRepository;
-import by.clevertech.dao.repository.ProductRepository;
+import by.clevertech.data.entity.CheckItem;
+import by.clevertech.data.entity.DiscountCard;
+import by.clevertech.data.entity.Product;
+import by.clevertech.data.repository.CardRepository;
+import by.clevertech.data.repository.ProductRepository;
 import by.clevertech.service.CheckService;
-import by.clevertech.service.dto.CheckDto;
-import by.clevertech.service.dto.CheckInputDto;
+import by.clevertech.service.dto.CheckOutDto;
+import by.clevertech.service.dto.CheckInDto;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,8 +25,8 @@ public class CheckServiceImpl implements CheckService {
 	private final CardRepository cardRepository;
 
 	@Override
-	public CheckDto get(CheckInputDto checkInputDto) {
-		CheckDto check = new CheckDto();
+	public CheckOutDto get(CheckInDto checkInputDto) {
+		CheckOutDto check = new CheckOutDto();
 		List<CheckItem> items = getCheckItems(checkInputDto);
 		check.setProducts(items);
 		Long cardId = checkInputDto.getCardId();
@@ -45,7 +45,7 @@ public class CheckServiceImpl implements CheckService {
 		return check;
 	}
 
-	private List<CheckItem> getCheckItems(CheckInputDto checkInputDto) {
+	private List<CheckItem> getCheckItems(CheckInDto checkInputDto) {
 		List<CheckItem> items = new ArrayList<>();
 		Map<Long, Integer> products = checkInputDto.getProducts();
 		for (Long productId : products.keySet()) {
@@ -102,7 +102,7 @@ public class CheckServiceImpl implements CheckService {
 	}
 
 	@Override
-	public CheckDto findById(Long id) {
+	public CheckOutDto findById(Long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}

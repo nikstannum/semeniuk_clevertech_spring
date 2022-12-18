@@ -7,42 +7,42 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import by.clevertech.service.dto.error.ErrorDto;
+import by.clevertech.service.dto.ErrorDto;
 
 @RestControllerAdvice(basePackages = { "by.clevertech.rest", "by.clevertech.repository", "by.clevertech.service" })
 public class RestExceptionAdvice {
     private static final Logger log = LogManager.getLogger(RestExceptionAdvice.class);
 
-    private static final String SERVER_ERROR = "Server error";
-    private static final String CLIENT_ERROR = "Client error";
+    private static final String MSG_SERVER_ERROR = "Server error";
+    private static final String MSG_CLIENT_ERROR = "Client error";
     private static final String DEFAULT_MESSAGE = "Unknown error";
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDto error(EntityNotFoundException e) {
         log.error(e.getMessage());
-        return new ErrorDto(CLIENT_ERROR, e.getMessage());
+        return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto error(ClientException e) {
         log.error(e.getMessage());
-        return new ErrorDto(CLIENT_ERROR, e.getMessage());
+        return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto error(ClevertechException e) {
         log.error(e.getMessage());
-        return new ErrorDto(CLIENT_ERROR, e.getMessage());
+        return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto error(Exception e) {
         log.error(e.getMessage());
-        return new ErrorDto(SERVER_ERROR, DEFAULT_MESSAGE);
+        return new ErrorDto(MSG_SERVER_ERROR, DEFAULT_MESSAGE);
     }
 
 }

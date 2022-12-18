@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration status="ERROR" monitorInterval="3600">
+<Configuration status="ERROR" monitorInterval="1">
     <Properties>
         <property name="pattern_file">
             %d{dd-MM-yyyy HH:mm:ss} [%t] %-5level %logger{3} - %msg method %M%n
-        </property>
-        <property name="pattern_console">
-            %r [%t] %5level %logger{1} - %msg method %M%n
         </property>
     </Properties>
     <Appenders>
@@ -17,17 +14,11 @@
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-        <Console name="Console" target="SYSTEM.OUT">
-            <PatternLayout pattern="${pattern_console}"/>
-        </Console>
     </Appenders>
     <Loggers>
-        <Root level="DEBUG">
-            <AppenderRef ref="Console"/>
-        </Root>
-        <Logger level="INFO" name="com.belhard">
+        <Root level="ERROR">
             <AppenderRef ref="TxtFile"/>
-        </Logger>
+        </Root>
     </Loggers>
 </Configuration>
 

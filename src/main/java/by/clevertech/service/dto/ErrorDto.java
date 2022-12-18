@@ -1,4 +1,4 @@
-package by.clevertech.service.dto.error;
+package by.clevertech.service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

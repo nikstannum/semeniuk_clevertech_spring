@@ -28,25 +28,14 @@ public class RestCheckController {
     public CheckOutDto getCheck(@RequestParam(value = "itemId") List<Long> items,
             @RequestParam(value = "card", required = false) Long cardId) {
         CheckInDto dto = processParams(items, cardId);
-        CheckOutDto check = checkService.get(dto);
-        return check;
+        return checkService.get(dto);
     }
 
     private CheckInDto processParams(List<Long> list, Long cardId) {
         CheckInDto dto = new CheckInDto();
+        dto.setCardId(cardId);
         Map<Long, Integer> items = new HashMap<>();
-        if (cardId != null) {
-            dto.setCardId(cardId);
-        }
-        for (Long itemId : list) {
-            if (items.containsKey(itemId)) {
-                Integer quantity = items.get(itemId);
-                quantity++;
-                items.replace(itemId, quantity);
-            } else {
-                items.put(itemId, 1);
-            }
-        }
+        list.forEach(itemId -> items.merge(itemId, 1, Integer::sum));
         dto.setProducts(items);
         return dto;
     }

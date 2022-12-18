@@ -9,8 +9,9 @@ import lombok.Data;
 @Data
 public class Check {
 
-	private String header;
-	private LocalDateTime timestamp;
-	private List<CheckItem> products;
-	private BigDecimal totalCost;
+    private String header;
+    private LocalDateTime timestamp;
+    private List<CheckItem> items;
+    private BigDecimal totalCost;
+    private BigDecimal fullCost;
 }

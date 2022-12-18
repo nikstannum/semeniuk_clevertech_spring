@@ -14,97 +14,94 @@ import by.clevertech.data.entity.Product;
 import by.clevertech.data.repository.CardRepository;
 import by.clevertech.data.repository.ProductRepository;
 import by.clevertech.service.CheckService;
-import by.clevertech.service.dto.CheckOutDto;
 import by.clevertech.service.dto.CheckInDto;
+import by.clevertech.service.dto.CheckOutDto;
 import lombok.RequiredArgsConstructor;
+
 
 @Service
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
-	private final ProductRepository productRepository;
-	private final CardRepository cardRepository;
+    private static final int PERCENT_100 = 100;
+    private static final int DISCOUNT_SIZE = 10;
+    private static final int DECIMAL_SCALE = 2;
+    /**
+     * Minimal number of products in check to apply discounts
+     */
+    private static final int MIN_NUMBER_OF_PRODUCTS = 5;
+    private final ProductRepository productRepository;
+    private final CardRepository cardRepository;
 
-	@Override
-	public CheckOutDto get(CheckInDto checkInputDto) {
-		CheckOutDto check = new CheckOutDto();
-		List<CheckItem> items = getCheckItems(checkInputDto);
-		check.setProducts(items);
-		Long cardId = checkInputDto.getCardId();
-		/*
-		 * TODO Processing EntNotFoundExc: if the card is not found, then the
-		 * application should not crash
-		 */
-		BigDecimal costWithoutDiscounts = totalCostWithoutDiscounts(items);
-		BigDecimal costWithoutCard = totalCostWithoutCard(items);
-		if (cardId != null) {
-			BigDecimal costWithCard = totalCostWithCard(costWithoutCard, cardId);
-			check.setTotalCost(costWithCard);
-			return check;
-		}
-		check.setTotalCost(costWithoutCard);
-		return check;
-	}
+    @Override
+    public CheckOutDto get(CheckInDto checkInputDto) {
+        CheckOutDto check = new CheckOutDto();
+        List<CheckItem> items = getCheckItems(checkInputDto.getProducts());
+        check.setItems(items);
+        Long cardId = checkInputDto.getCardId();
+        check.setFullCost(getFullCost(items));
+        BigDecimal totalCost = getTotalCost(cardId, items);
+        check.setTotalCost(totalCost);
+        return check;
+    }
 
-	private List<CheckItem> getCheckItems(CheckInDto checkInputDto) {
-		List<CheckItem> items = new ArrayList<>();
-		Map<Long, Integer> products = checkInputDto.getProducts();
-		for (Long productId : products.keySet()) {
-			CheckItem item = new CheckItem();
-			Product product = productRepository.findById(productId);
-			Integer quantity = products.get(productId);
-			BigDecimal total = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-			item.setQuantity(quantity);
-			item.setProduct(product);
-			item.setTotal(total);
-			items.add(item);
-		}
-		return items;
-	}
+    private BigDecimal getTotalCost(Long cardId, List<CheckItem> items) {
+        BigDecimal costWithoutCard = applyProductDiscounts(items);
+        return cardId == null ? costWithoutCard : applyDiscountCard(costWithoutCard, cardId);
+    }
 
-	private BigDecimal totalCostWithoutDiscounts(List<CheckItem> items) {
-		BigDecimal totalCostWithoutDiscount = BigDecimal.ZERO;
-		for (CheckItem item : items) {
-			totalCostWithoutDiscount = totalCostWithoutDiscount.add(item.getTotal());
-		}
-		return totalCostWithoutDiscount.setScale(2, RoundingMode.HALF_UP);
-	}
+    private List<CheckItem> getCheckItems(Map<Long, Integer> products) {
+        List<CheckItem> items = new ArrayList<>();
+        products.forEach((id, quantity) -> items.add(getCheckItem(id, quantity)));
+        return items;
+    }
 
-	private BigDecimal costDicsountItem(CheckItem item) {
-		BigDecimal discountForDiscountProduct = BigDecimal.valueOf(10); // FIXME Magic number (discount size = 10%)
-		BigDecimal discountFactor = BigDecimal.valueOf(100).subtract(discountForDiscountProduct);
-		BigDecimal cost = item.getTotal().multiply(discountFactor).divide(BigDecimal.valueOf(100));
-		return cost.setScale(2, RoundingMode.HALF_UP);
-	}
+    private CheckItem getCheckItem(Long id, Integer quantity) {
+        CheckItem item = new CheckItem();
+        Product product = productRepository.findById(id);
+        BigDecimal total = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        item.setQuantity(quantity);
+        item.setProduct(product);
+        item.setTotal(total);
+        return item;
+    }
 
-	private BigDecimal totalCostWithoutCard(List<CheckItem> items) {
-		BigDecimal totalCost = BigDecimal.ZERO;
-		for (CheckItem item : items) {
-			Integer quantity = item.getQuantity();
-			Product product = item.getProduct();
-			if (quantity > 5 && product.isDiscount()) {
-				totalCost = totalCost.add(costDicsountItem(item));
-			} else {
-				totalCost = totalCost.add(item.getTotal());
-			}
-		}
-		return totalCost.setScale(2, RoundingMode.HALF_UP);
-	}
+    private BigDecimal getFullCost(List<CheckItem> items) {
+        BigDecimal fullCost = BigDecimal.ZERO;
+        for (CheckItem item : items) {
+            fullCost = fullCost.add(item.getTotal());
+        }
+        return fullCost.setScale(DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
 
-	private BigDecimal totalCostWithCard(BigDecimal cost, Long cardId) {
-		BigDecimal totalCost = cost;
-		DiscountCard card = cardRepository.findById(cardId);
-		if (card != null) { // FIXME how will to processing better?
-			BigDecimal discountSize = card.getDiscountSize();
-			BigDecimal discountFactor = BigDecimal.valueOf(100).subtract(discountSize);
-			totalCost = totalCost.multiply(discountFactor).divide(BigDecimal.valueOf(100));
-		}
-		return totalCost.setScale(2, RoundingMode.HALF_UP);
-	}
+    private BigDecimal costDicsountItem(CheckItem item) {
+        BigDecimal discountForDiscountProduct = BigDecimal.valueOf(DISCOUNT_SIZE);
+        BigDecimal discountFactor = BigDecimal.valueOf(PERCENT_100).subtract(discountForDiscountProduct);
+        BigDecimal cost = item.getTotal().multiply(discountFactor).divide(BigDecimal.valueOf(PERCENT_100));
+        return cost.setScale(DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
 
-	@Override
-	public CheckOutDto findById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private BigDecimal applyProductDiscounts(List<CheckItem> items) {
+        BigDecimal totalCost = BigDecimal.ZERO;
+        for (CheckItem item : items) {
+            Integer quantity = item.getQuantity();
+            Product product = item.getProduct();
+            if (quantity > MIN_NUMBER_OF_PRODUCTS && product.isDiscount()) {
+                totalCost = totalCost.add(costDicsountItem(item));
+            } else {
+                totalCost = totalCost.add(item.getTotal());
+            }
+        }
+        return totalCost.setScale(DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
 
+    private BigDecimal applyDiscountCard(BigDecimal cost, Long cardId) {
+        BigDecimal totalCost = cost;
+        DiscountCard card = cardRepository.findById(cardId);
+        if (card != null) { // FIXME how will to processing better?
+            BigDecimal discountSize = card.getDiscountSize();
+            BigDecimal discountFactor = BigDecimal.valueOf(PERCENT_100).subtract(discountSize);
+            totalCost = totalCost.multiply(discountFactor).divide(BigDecimal.valueOf(PERCENT_100));
+        }
+        return totalCost.setScale(DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
 }

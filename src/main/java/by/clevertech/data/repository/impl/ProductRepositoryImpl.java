@@ -22,7 +22,8 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Class for data access {@link Product}.
  * <p>
- * Accessed using named parameters {@link NamedParameterJdbcTemplate}
+ * Accessed using named parameters {@link NamedParameterJdbcTemplate} of the
+ * Spring Data
  * 
  * @author Nikita Semeniuk
  *

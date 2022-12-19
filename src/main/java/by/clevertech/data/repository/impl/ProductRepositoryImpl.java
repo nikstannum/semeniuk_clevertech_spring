@@ -14,9 +14,19 @@ import org.springframework.stereotype.Repository;
 
 import by.clevertech.data.entity.Product;
 import by.clevertech.data.repository.ProductRepository;
-import by.clevertech.exception.DataException;
+import by.clevertech.exception.ClientException;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implements {@link ProductRepository}
+ * <p>
+ * Class for data access {@link Product}.
+ * <p>
+ * Accessed using named parameters {@link NamedParameterJdbcTemplate}
+ * 
+ * @author Nikita Semeniuk
+ *
+ */
 @Repository
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements ProductRepository {
@@ -44,7 +54,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         template.update(INSERT, params, keyHolder);
         Number key = keyHolder.getKey();
         if (key == null) {
-            throw new DataException(EXC_MSG_CREATE);
+            throw new ClientException(EXC_MSG_CREATE);
         }
         Long id = key.longValue();
         return findById(id);
@@ -69,7 +79,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .addValue(COL_DISCOUNT, entity.isDiscount()).addValue(PARAM_ID, entity.getId());
         int rowUpdated = template.update(UPDATE, params);
         if (rowUpdated == 0) {
-            throw new DataException(EXC_MSG_UPDATE + entity.getId());
+            throw new ClientException(EXC_MSG_UPDATE + entity.getId());
         }
         return findById(entity.getId());
     }

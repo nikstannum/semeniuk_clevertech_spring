@@ -14,9 +14,19 @@ import org.springframework.stereotype.Repository;
 
 import by.clevertech.data.entity.DiscountCard;
 import by.clevertech.data.repository.CardRepository;
-import by.clevertech.exception.DataException;
+import by.clevertech.exception.ClientException;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Implements {@link CardRepository}
+ * <p>
+ * Class for data access {@link DiscountCard}.
+ * <p>
+ * Accessed using named parameters {@link NamedParameterJdbcTemplate}
+ * 
+ * @author Nikita Semeniuk
+ *
+ */
 @Repository
 @RequiredArgsConstructor
 public class CardRepositoryImpl implements CardRepository {
@@ -42,7 +52,7 @@ public class CardRepositoryImpl implements CardRepository {
         template.update(INSERT, params, keyHolder);
         Number key = keyHolder.getKey();
         if (key == null) {
-            throw new DataException(EXC_MSG_CREATE);
+            throw new ClientException(EXC_MSG_CREATE);
         }
         Long id = key.longValue();
         return findById(id);
@@ -67,7 +77,7 @@ public class CardRepositoryImpl implements CardRepository {
         params.addValue(PARAM_CARD_ID, entity.getCardId());
         int rowUpdated = template.update(UPDATE, params);
         if (rowUpdated == 0) {
-            throw new DataException(EXC_MSG_UPDATE + entity.getCardId());
+            throw new ClientException(EXC_MSG_UPDATE + entity.getCardId());
         }
         return findById(entity.getCardId());
     }

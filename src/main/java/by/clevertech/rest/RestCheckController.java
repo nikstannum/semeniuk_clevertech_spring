@@ -16,6 +16,12 @@ import by.clevertech.service.dto.CheckInDto;
 import by.clevertech.service.dto.CheckOutDto;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * RESTFUL interface for getting a receipt
+ * 
+ * @author Nikita Semeniuk
+ *
+ */
 @RestController
 @RequestMapping("check")
 @RequiredArgsConstructor

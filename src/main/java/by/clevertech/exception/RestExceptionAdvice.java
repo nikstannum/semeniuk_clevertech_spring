@@ -8,6 +8,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import by.clevertech.service.dto.ErrorDto;
 import lombok.extern.log4j.Log4j2;
 
+/**
+ * A class for handling errors before they are displayed to a third-party
+ * service.
+ * 
+ * @author Nikita Semeniuk
+ *
+ */
 @Log4j2
 @RestControllerAdvice(basePackages = { "by.clevertech.rest", "by.clevertech.repository", "by.clevertech.service" })
 public class RestExceptionAdvice {

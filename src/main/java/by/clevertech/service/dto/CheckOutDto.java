@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import by.clevertech.data.entity.CheckItem;
 import lombok.Data;
 
@@ -17,6 +19,7 @@ import lombok.Data;
 @Data
 public class CheckOutDto {
     private String header;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime timestamp;
     private List<CheckItem> items;
     private BigDecimal fullCost;

@@ -1,6 +1,6 @@
 package by.clevertech.service.dto;
 
-import by.clevertech.exception.RestExceptionAdvice;
+import by.clevertech.web.RestExceptionAdvice;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

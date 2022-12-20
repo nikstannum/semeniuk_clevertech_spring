@@ -1,0 +1,3 @@
+20-12-2022 16:48:45 ERROR clevertech.exception.RestExceptionAdvice - Required request parameter 'itemId' for method parameter type List is not present method error
+20-12-2022 16:50:42 ERROR clevertech.exception.RestExceptionAdvice - Required request parameter 'itemId' for method parameter type List is not present. method error
+20-12-2022 16:51:09 ERROR clevertech.exception.RestExceptionAdvice - Required request parameter 'itemId' for method parameter type List is not present. Method error

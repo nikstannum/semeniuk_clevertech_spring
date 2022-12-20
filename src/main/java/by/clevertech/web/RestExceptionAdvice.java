@@ -1,10 +1,13 @@
-package by.clevertech.exception;
+package by.clevertech.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import by.clevertech.exception.ClevertechException;
+import by.clevertech.exception.ClientException;
+import by.clevertech.exception.EntityNotFoundException;
 import by.clevertech.service.dto.ErrorDto;
 import lombok.extern.log4j.Log4j2;
 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import by.clevertech.data.entity.Product;
 import by.clevertech.data.repository.ProductRepository;
 import by.clevertech.exception.ClientException;
+import by.clevertech.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -31,8 +33,8 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class ProductRepositoryImpl implements ProductRepository {
+    private static final String EXC_MSG_NOT_FOUND = "wasn't found product with id = ";
     private static final String EXC_MSG_UPDATE = "couldn't update product with id = ";
-    private static final String EXC_MSG_CREATE = "couldn't create new product";
     private static final String PARAM_ID = "id";
     private static final String COL_DISCOUNT = "discount";
     private static final String COL_PRICE = "price";
@@ -54,9 +56,6 @@ public class ProductRepositoryImpl implements ProductRepository {
                 entity.isDiscount());
         template.update(INSERT, params, keyHolder);
         Number key = keyHolder.getKey();
-        if (key == null) {
-            throw new ClientException(EXC_MSG_CREATE);
-        }
         Long id = key.longValue();
         return findById(id);
     }
@@ -65,7 +64,11 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Product findById(Long id) {
         Map<String, Object> params = new HashMap<>();
         params.put(PARAM_ID, id);
-        return template.queryForObject(FIND_BY_ID, params, this::mapRow);
+        try {
+            return template.queryForObject(FIND_BY_ID, params, this::mapRow);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new EntityNotFoundException(EXC_MSG_NOT_FOUND + id, e);
+        }
     }
 
     @Override

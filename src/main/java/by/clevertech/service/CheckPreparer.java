@@ -1,7 +1,6 @@
 package by.clevertech.service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Component;
 
@@ -19,10 +18,7 @@ public class CheckPreparer {
 
     public CheckOutDto prepareCheck(CheckOutDto dto) {
         dto.setHeader(HEADER);
-        LocalDateTime dateTime = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        LocalDateTime formatted = LocalDateTime.parse(dateTime.format(formatter), formatter);
-        dto.setTimestamp(formatted);
+        dto.setTimestamp(LocalDateTime.now());
         return dto;
     }
 }

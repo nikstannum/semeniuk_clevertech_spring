@@ -1,4 +1,4 @@
-package by.clevertech.rest;
+package by.clevertech.web.controller;
 
 import java.util.HashMap;
 import java.util.List;

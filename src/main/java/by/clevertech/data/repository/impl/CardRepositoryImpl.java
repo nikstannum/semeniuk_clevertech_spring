@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import by.clevertech.data.entity.DiscountCard;
 import by.clevertech.data.repository.CardRepository;
 import by.clevertech.exception.ClientException;
+import by.clevertech.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -35,7 +37,7 @@ public class CardRepositoryImpl implements CardRepository {
     private static final String EXC_MSG_UPDATE = "couldn't update card with id = ";
     private static final String PARAM_DISCOUNT_SIZE = "discountSize";
     private static final String PARAM_CARD_ID = "cardId";
-    private static final String EXC_MSG_CREATE = "couldn't create new card";
+    private static final String EXC_MSG_NOT_FOUND = "wasn't found product with id = ";
     private static final String COL_DISCOUNT_SIZE = "discount_size";
     private static final String FIND_BY_ID = "SELECT c.card_id, c.discount_size FROM discount_card c WHERE c.card_id = :cardId";
     private static final String FIND_ALL = "SELECT c.card_id, c.discount_size FROM discount_card c";
@@ -52,9 +54,6 @@ public class CardRepositoryImpl implements CardRepository {
         params.addValue(COL_DISCOUNT_SIZE, entity.getDiscountSize());
         template.update(INSERT, params, keyHolder);
         Number key = keyHolder.getKey();
-        if (key == null) {
-            throw new ClientException(EXC_MSG_CREATE);
-        }
         Long id = key.longValue();
         return findById(id);
     }
@@ -63,7 +62,11 @@ public class CardRepositoryImpl implements CardRepository {
     public DiscountCard findById(Long id) {
         Map<String, Object> params = new HashMap<>();
         params.put(PARAM_CARD_ID, id);
-        return template.queryForObject(FIND_BY_ID, params, this::mapRow);
+        try {
+            return template.queryForObject(FIND_BY_ID, params, this::mapRow);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new EntityNotFoundException(EXC_MSG_NOT_FOUND + id, e);
+        }
     }
 
     @Override

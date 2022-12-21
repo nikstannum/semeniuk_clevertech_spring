@@ -2,6 +2,7 @@ package by.clevertech.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +14,10 @@ import by.clevertech.data.entity.DiscountCard;
 import by.clevertech.data.entity.Product;
 import by.clevertech.data.repository.CardRepository;
 import by.clevertech.data.repository.ProductRepository;
-import by.clevertech.service.CheckPreparer;
 import by.clevertech.service.CheckService;
 import by.clevertech.service.dto.CheckInDto;
 import by.clevertech.service.dto.CheckOutDto;
+import by.clevertech.service.exception.ClientException;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -31,19 +32,20 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CheckServiceImpl implements CheckService {
+    private static final String MSG_EXC_INVALID_NUMBER = "invalid number of products";
     private static final int PERCENT_100 = 100;
     /**
      * Set amount of discount
      */
     private static final int DISCOUNT_SIZE = 10;
     private static final int DECIMAL_SCALE = 2;
+    private static final String HEADER = "CASH RECEIPT SUPERMARKET 123 12, MILKYWAY Galaxy/ Earth Tel: 123-456-7890 CASHIER: 1234";
     /**
      * Minimal number of products in check to apply discounts
      */
     private static final int MIN_NUMBER_OF_PRODUCTS = 5;
     private final ProductRepository productRepository;
     private final CardRepository cardRepository;
-    private final CheckPreparer preparer;
 
     @Override
     public CheckOutDto get(CheckInDto checkInputDto) {
@@ -54,8 +56,9 @@ public class CheckServiceImpl implements CheckService {
         check.setFullCost(getFullCost(items));
         BigDecimal totalCost = getTotalCost(cardId, items);
         check.setTotalCost(totalCost);
-        CheckOutDto preparedCheck = preparer.prepareCheck(check);
-        return preparedCheck;
+        check.setHeader(HEADER);
+        check.setTimestamp(LocalDateTime.now());
+        return check;
     }
 
     private BigDecimal getTotalCost(Long cardId, List<CheckItem> items) {
@@ -65,8 +68,12 @@ public class CheckServiceImpl implements CheckService {
 
     private List<CheckItem> getCheckItems(Map<Long, Integer> products) {
         List<CheckItem> items = new ArrayList<>();
-        products.forEach((id, quantity) -> items.add(getCheckItem(id, quantity)));
-        return items;
+        try {
+            products.forEach((id, quantity) -> items.add(getCheckItem(id, quantity)));
+            return items;
+        } catch (NullPointerException e) {
+            throw new ClientException(MSG_EXC_INVALID_NUMBER);
+        }
     }
 
     private CheckItem getCheckItem(Long id, Integer quantity) {
@@ -111,7 +118,7 @@ public class CheckServiceImpl implements CheckService {
     private BigDecimal applyDiscountCard(BigDecimal cost, Long cardId) {
         BigDecimal totalCost = cost;
         DiscountCard card = cardRepository.findById(cardId);
-        if (card != null) { // FIXME how will to processing better?
+        if (card != null) {
             BigDecimal discountSize = card.getDiscountSize();
             BigDecimal discountFactor = BigDecimal.valueOf(PERCENT_100).subtract(discountSize);
             totalCost = totalCost.multiply(discountFactor).divide(BigDecimal.valueOf(PERCENT_100));

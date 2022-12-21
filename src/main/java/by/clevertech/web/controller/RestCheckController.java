@@ -34,7 +34,8 @@ public class RestCheckController {
     public CheckOutDto getCheck(@RequestParam(value = "itemId") List<Long> items,
             @RequestParam(value = "card", required = false) Long cardId) {
         CheckInDto dto = processParams(items, cardId);
-        return checkService.get(dto);
+        CheckOutDto out = checkService.get(dto);
+        return out;
     }
 
     private CheckInDto processParams(List<Long> list, Long cardId) {

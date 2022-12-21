@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import by.clevertech.exception.ClevertechException;
-import by.clevertech.exception.ClientException;
-import by.clevertech.exception.EntityNotFoundException;
 import by.clevertech.service.dto.ErrorDto;
+import by.clevertech.service.exception.ClevertechException;
+import by.clevertech.service.exception.ClientException;
+import by.clevertech.service.exception.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -44,7 +44,7 @@ public class RestExceptionAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto error(ClevertechException e) {
         log.error(e.getMessage());
-        return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
+        return new ErrorDto(MSG_SERVER_ERROR, e.getMessage());
     }
 
     @ExceptionHandler

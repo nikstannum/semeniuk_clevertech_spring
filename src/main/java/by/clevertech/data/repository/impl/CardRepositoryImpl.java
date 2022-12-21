@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
 
 import by.clevertech.data.entity.DiscountCard;
 import by.clevertech.data.repository.CardRepository;
-import by.clevertech.exception.ClientException;
-import by.clevertech.exception.EntityNotFoundException;
+import by.clevertech.service.exception.ClientException;
+import by.clevertech.service.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 /**

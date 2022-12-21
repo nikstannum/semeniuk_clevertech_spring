@@ -18,7 +18,7 @@ Java 17, Spring Framework (Core container, Spring MVC, Spring Data (JDBC), tool 
 
 1) run the application in the TOMCAT servlet container (this application was developed using the version 9.0.62)
 2) open browser (Google Browser should be preferred)
-3) open developer tools
+3) open developer tools (if you are not using browser plugins like JSON viewer)
 4) enter a request in the address bar in the format http://localhost:portNumber/check?params (for example: http://localhost:8080/check?itemId=1&itemId=1&itemId=2&card=1)
 
 ## Endpoints description:

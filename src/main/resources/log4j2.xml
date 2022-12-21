@@ -4,9 +4,6 @@
         <property name="pattern_file">
             %d{dd-MM-yyyy HH:mm:ss} %-5level %logger{3} - %msg. Method %M%n
         </property>
-        <property name="pattern_console">
-            %r %5level %logger{2} - %msg. Method %M%n
-        </property>
     </Properties>
     <Appenders>
         <RollingFile name="TxtFile" fileName="logs/log.txt" filePattern="${date:dd-MM-yyyy}/%d{mm-HH}_%i.txt"
@@ -17,13 +14,9 @@
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-        <Console name="Console" target="SYSTEM.OUT">
-            <PatternLayout pattern="${pattern_console}"/>
-        </Console>
     </Appenders>
     <Loggers>
         <Root level="ERROR">
-            <AppenderRef ref="Console"/>
             <AppenderRef ref="TxtFile"/>
         </Root>
     </Loggers>

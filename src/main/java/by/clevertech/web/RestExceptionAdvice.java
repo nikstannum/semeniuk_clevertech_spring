@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j2;
  *
  */
 @Log4j2
-@RestControllerAdvice(basePackages = { "by.clevertech.rest", "by.clevertech.repository", "by.clevertech.service" })
+@RestControllerAdvice("by.clevertech")
 public class RestExceptionAdvice {
 
     private static final String MSG_SERVER_ERROR = "Server error";
@@ -29,28 +29,28 @@ public class RestExceptionAdvice {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDto error(EntityNotFoundException e) {
-        log.error(e.getMessage());
+        log.error(e);
         return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto error(ClientException e) {
-        log.error(e.getMessage());
+        log.error(e);
         return new ErrorDto(MSG_CLIENT_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto error(ClevertechException e) {
-        log.error(e.getMessage());
+        log.error(e);
         return new ErrorDto(MSG_SERVER_ERROR, e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto error(Exception e) {
-        log.error(e.getMessage());
+        log.error(e);
         return new ErrorDto(MSG_SERVER_ERROR, DEFAULT_MESSAGE);
     }
 
